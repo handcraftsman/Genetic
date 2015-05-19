@@ -1,0 +1,8 @@
+[package]
+name = "genetic"
+version = "0.0.2"
+authors = ["Clinton <sheppard@cs.unm.edu>"]
+
+[dependencies]
+rand = "*"
+time = "*"
