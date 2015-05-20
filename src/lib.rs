@@ -1,21 +1,27 @@
-extern crate time;
 extern crate rand;
 
 pub mod genetic {
-    use rand::{thread_rng, sample, Rng};
-    use time::PreciseTime;
 
-    pub fn get_best(get_fitness: fn(&String,&str) -> usize, display: fn(&String, &str, start: PreciseTime), target: &str, gene_set: &str, length: usize, start: PreciseTime) -> String {
+    use rand::{thread_rng, sample, Rng};
+
+    pub fn get_best<F,D>(
+        get_fitness: F, 
+        display: D, 
+        length: usize, 
+        gene_set: &str) -> String
+        where F : Fn(&String)->usize,
+        D : Fn(&String)
+    {
         let mut best_parent = generate_parent(gene_set, length);
-        let mut best_fitness = get_fitness(&best_parent, target);
+        let mut best_fitness = get_fitness(&best_parent);
 
         while best_fitness < length {
             let child = mutate_parent(&best_parent, gene_set);
-            let fitness = get_fitness(&child, target);
+            let fitness = get_fitness(&child);
             if fitness > best_fitness {
                 best_fitness = fitness;
                 best_parent = child;
-                display(&best_parent, target, start);
+                display(&best_parent);
             }
         }
 
@@ -43,5 +49,4 @@ pub mod genetic {
         }
         candidate
     }
-
 }
