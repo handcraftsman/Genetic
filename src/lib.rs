@@ -8,14 +8,16 @@ pub mod genetic {
         get_fitness: F, 
         display: D, 
         length: usize, 
+        optimal_fitness_value: usize,
         gene_set: &str) -> String
         where F : Fn(&String)->usize,
         D : Fn(&String)
     {
         let mut best_parent = generate_parent(gene_set, length);
         let mut best_fitness = get_fitness(&best_parent);
+        display(&best_parent);
 
-        while best_fitness < length {
+        while best_fitness < optimal_fitness_value {
             let child = mutate_parent(&best_parent, gene_set);
             let fitness = get_fitness(&child);
             if fitness > best_fitness {
