@@ -12,19 +12,18 @@ mod tests {
         let start = PreciseTime::now();
         let gene_set = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#";
 
-        let wrapped_display = |candidate: &String| {display_8_queens(&candidate, gene_set, start);};
+        let wrapped_display = |candidate: &genetic::Individual| {display_8_queens(&candidate, gene_set, start);};
         let wrapped_get_fitness = |candidate: &String| -> usize {get_8_queens_fitness(&candidate, gene_set)};
     
         let best = genetic::get_best(wrapped_get_fitness, wrapped_display, 8, 8*8*8*8, gene_set);
         println!("Total time: {}", start.to(PreciseTime::now()));
-        let best_fitness = get_8_queens_fitness(&best, gene_set);
-        assert_eq!(best_fitness,8*8*8*8);
+        assert_eq!(best.fitness, 8*8*8*8);
     }
     
-    fn display_8_queens(candidate: &String, gene_set: &str, start: PreciseTime) {
+    fn display_8_queens(candidate: &genetic::Individual, gene_set: &str, start: PreciseTime) {
         let now = PreciseTime::now();
         let elapsed = start.to(now);
-        let board:[[char; 8]; 8] = get_board(candidate, gene_set);
+        let board:[[char; 8]; 8] = get_board(&candidate.genes, gene_set);
         for i in 0..8 {
             let mut row = "".to_string();
             for j in 0..8 {
@@ -34,7 +33,7 @@ mod tests {
             println!("{}", row);
         }
         
-        println!("{}\t{}\t{}", candidate, get_8_queens_fitness(&candidate, gene_set), elapsed);
+        println!("{}\t{}\t{}", candidate.genes, candidate.fitness, elapsed);
     }
     
     fn get_8_queens_fitness(candidate: &String, gene_set: &str) -> usize {
