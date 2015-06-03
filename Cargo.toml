@@ -1,6 +1,6 @@
 [package]
 name = "genetic"
-version = "0.0.3"
+version = "0.0.5"
 authors = ["Clinton <sheppard@cs.unm.edu>"]
 
 [dependencies]

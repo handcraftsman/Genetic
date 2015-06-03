@@ -17,9 +17,23 @@ pub mod genetic {
         display(&best_parent);
 
         while best_parent.fitness < optimal_fitness_value {
-            let child = mutate_parent(&best_parent, &get_fitness, gene_set);
-            if child.fitness > best_parent.fitness {
-                best_parent = child;
+            let mut candidate = generate_parent(&get_fitness, gene_set, length);
+            let mut attempts_since_last_improvement = 0;
+            while attempts_since_last_improvement < 100 {
+                let child = match attempts_since_last_improvement % 3 {
+                    0 => generate_parent(&get_fitness, gene_set, length),
+                    1 => mutate_parent(&candidate, &get_fitness, gene_set),
+                    _ => crossover(&candidate, &best_parent, &get_fitness)
+                };
+
+                if child.fitness > candidate.fitness { 
+                    candidate = child;
+                    attempts_since_last_improvement = 0;
+                }
+                attempts_since_last_improvement = attempts_since_last_improvement + 1;
+            }
+            if candidate.fitness > best_parent.fitness { 
+                best_parent = candidate;
                 display(&best_parent);
             }
         }
@@ -52,6 +66,25 @@ pub mod genetic {
         if parent_index+1 < parent1.genes.len() {
             candidate.push_str(&parent1.genes[parent_index+1..]);
         }
+        let fitness = get_fitness(&candidate);
+        Individual { genes: candidate, fitness: fitness }
+    }
+    
+    fn crossover<F>(parent1: &Individual, parent2: &Individual, get_fitness: F) -> Individual
+    where F : Fn(&String)->usize
+    {
+        let mut rng = thread_rng();
+        let parent_index = rng.gen::<usize>() % parent1.genes.len();
+        let mut candidate = String::with_capacity(parent1.genes.len());
+
+        if parent_index > 0 {
+            candidate.push_str(&parent1.genes[..parent_index]);
+        }
+        candidate.push_str(&parent2.genes[parent_index..(1+parent_index)]); // replace 1 gene
+        if parent_index+1 < parent1.genes.len() {
+            candidate.push_str(&parent1.genes[parent_index+1..]);
+        }
+
         let fitness = get_fitness(&candidate);
         Individual { genes: candidate, fitness: fitness }
     }
